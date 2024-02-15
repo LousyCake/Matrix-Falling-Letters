@@ -16,13 +16,13 @@ const (
 	minFallSpeed = 1
 	maxFallSpeed = 5
 	fadeRate     = 0.03
-	trailLength  = 50 // Increased trail length
+	trailLength  = 50
 	outputDir    = "output"
 )
 
 var (
 	characters    = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-=_+[]{}|;':,.<>/?`~ "
-	defaultColors = []float64{0, 1, 0} // Green color
+	defaultColors = []float64{0, 1, 0}
 )
 
 type CodeParticle struct {
@@ -37,7 +37,7 @@ type CodeParticle struct {
 type TrailPoint struct {
 	X, Y      float64
 	Opacity   float64
-	Character rune // New field to store the character for each trail point
+	Character rune 
 }
 
 func main() {
@@ -64,11 +64,11 @@ func main() {
 			drawCodeParticles(context, codeParticles, frameCount)
 			frameCount++
 			writeFrameToFile(context, frameCount)
-			time.Sleep(time.Second / 30) // Assuming 30 frames per second
+			time.Sleep(time.Second / 30)
 		}
 	}
 
-	context.SavePNG("output/final_frame.png") // Save the final frame separately
+	context.SavePNG("output/final_frame.png")
 	fmt.Println("Frames saved to:", outputDir)
 }
 
@@ -78,7 +78,7 @@ func initializeCodeParticles() []CodeParticle {
 	for i := range codeParticles {
 		codeParticles[i] = CodeParticle{
 			X:            float64(rand.Intn(width)),
-			Y:            -float64(rand.Intn(height)), // Start above the screen
+			Y:            -float64(rand.Intn(height)),
 			Character:    rune(characters[rand.Intn(len(characters))]),
 			FallSpeed:    rand.Float64()*(maxFallSpeed-minFallSpeed) + minFallSpeed,
 			Opacity:      1.0,
@@ -117,7 +117,7 @@ func updateCodeParticles(codeParticles []CodeParticle) {
 }
 
 func drawCodeParticles(context *gg.Context, codeParticles []CodeParticle, frameCount int) {
-	context.SetRGB(0, 0, 0) // Black background
+	context.SetRGB(0, 0, 0)
 	context.Clear()
 
 	trailSpacing := 10.0 // Adjust the trail spacing
@@ -125,14 +125,11 @@ func drawCodeParticles(context *gg.Context, codeParticles []CodeParticle, frameC
 	for _, p := range codeParticles {
 		context.SetRGBA(defaultColors[0], defaultColors[1], defaultColors[2], p.Opacity)
 
-		// Draw the fading trail without overlapping
 		for i, trailPoint := range p.Trail {
-			// Make the letters change after every 10 frames
 			if i%10 == frameCount%10 {
 				trailPoint.Character = rune(characters[rand.Intn(len(characters))])
 			}
 
-			// Vary the speed and opacity for each trail point
 			speedVariation := rand.Float64() * 2.0   // Adjust the speed variation
 			opacityVariation := rand.Float64() * 0.5 // Adjust the opacity variation
 
@@ -143,7 +140,6 @@ func drawCodeParticles(context *gg.Context, codeParticles []CodeParticle, frameC
 			context.DrawStringAnchored(string(trailPoint.Character), trailPoint.X, trailPoint.Y+(float64(i)*trailSpacing), 0.5, 0.5)
 		}
 
-		// Draw the current particle
 		context.DrawStringAnchored(string(p.Character), p.X, p.Y, 0.5, 0.5)
 	}
 }
